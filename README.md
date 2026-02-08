@@ -119,6 +119,24 @@ sensors/{MQTT_USER}/{MQTT_DEVICE}
 - **Plateforme** : Espressif32
 - **IDE** : PlatformIO (VSCode)
 
+## Tests unitaires
+
+Des tests unitaires Python (pytest) verifient la logique de calcul du firmware :
+
+- **NTC** : equation Beta, calcul de resistance, plage de temperatures
+- **LDR** : conversion ADC vers pourcentage de luminosite
+- **ADC** : moyennage des echantillons
+- **MQTT** : structure et serialisation du payload JSON
+
+### Lancer les tests
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install pytest
+pytest tests/ -v
+```
+
 ## Structure du projet
 
 ```text
@@ -126,7 +144,8 @@ meteoStation/
 ├── src/           # Code source principal
 ├── include/       # Headers du projet
 ├── lib/           # Bibliotheques privees
-├── test/          # Tests unitaires
+├── tests/         # Tests unitaires Python (pytest)
+├── test/          # Tests PlatformIO
 └── platformio.ini # Configuration PlatformIO
 ```
 

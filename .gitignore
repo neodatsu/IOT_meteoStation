@@ -17,6 +17,14 @@ Thumbs.db
 # Credentials
 include/credentials.h
 
+# Python venv
+.venv/
+__pycache__/
+.pytest_cache/
+
+# Claude Code
+.claude/
+
 # IDE
 *.swp
 *.swo
