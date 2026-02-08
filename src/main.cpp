@@ -1,30 +1,33 @@
 /**
- * MeteoStation - Module temperature NTC
- *
- * Lecture de la temperature via un module thermistance NTC
- * connecte sur la sortie analogique (AO) du module.
- * La conversion utilise l'equation Beta (Steinhart-Hart simplifiee).
+ * MeteoStation - DHT11 + Module temperature NTC + LDR
  */
 
 #include <Arduino.h>
+#include <DHT.h>
 #include <math.h>
 
 // --- Configuration des pins ---
-#define TEMP_AO_PIN 34        // Sortie analogique du module NTC
+#define DHT_PIN     27    // Data DHT11
+#define TEMP_AO_PIN 34    // Sortie analogique du module NTC
+#define LDR_PIN     35    // Signal du module LDR KY-018
+
+// --- Parametres DHT11 ---
+#define DHT_TYPE DHT11
 
 // --- Parametres de lecture ---
-#define READ_INTERVAL 2000    // Intervalle entre les releves (ms)
-#define NB_SAMPLES 20         // Nombre de lectures pour le moyennage ADC
+#define READ_INTERVAL 10000
+#define NB_SAMPLES 20
 
-// --- Parametres de la thermistance NTC ---
-#define R_SERIES   10000.0    // Resistance serie du diviseur de tension (ohms)
-#define B_COEFF    3950.0     // Coefficient Beta de la thermistance
-#define R_NOMINAL  1760.0     // Resistance nominale calibree (ohms)
-#define T_NOMINAL  25.0       // Temperature de reference (C)
+// --- Parametres de la thermistance NTC (calibres pour le module) ---
+#define R_SERIES   10000.0
+#define B_COEFF    3950.0
+#define R_NOMINAL  1760.0
+#define T_NOMINAL  25.0
+
+DHT dht(DHT_PIN, DHT_TYPE);
 
 /**
  * Lecture analogique moyennee pour lisser le bruit de l'ADC ESP32.
- * Effectue NB_SAMPLES lectures espacees de 5ms et retourne la moyenne.
  */
 int analogReadAvg(int pin) {
   long sum = 0;
@@ -37,22 +40,40 @@ int analogReadAvg(int pin) {
 
 void setup() {
   Serial.begin(115200);
-  analogSetAttenuation(ADC_11db);  // Plage ADC 0-3.3V
-  delay(2000);                     // Stabilisation du capteur
+  dht.begin();
+  analogSetAttenuation(ADC_11db);
+  delay(2000);
   Serial.println("=== MeteoStation demarree ===");
 }
 
 void loop() {
+  // --- DHT11 ---
+  float humidity = dht.readHumidity();
+  float dhtTemp = dht.readTemperature();
+
+  // --- Module NTC ---
   int raw = analogReadAvg(TEMP_AO_PIN);
-
-  // Calcul de la resistance de la thermistance via le diviseur de tension
   float resistance = R_SERIES * raw / (4095.0 - raw);
-
-  // Conversion resistance -> temperature via l'equation Beta
   float tempK = 1.0 / (1.0 / (T_NOMINAL + 273.15) + log(resistance / R_NOMINAL) / B_COEFF);
-  float tempC = tempK - 273.15;
+  float ntcTemp = tempK - 273.15;
 
-  Serial.printf("Temperature : %.1f C\n", tempC);
+  // --- Affichage ---
+  Serial.flush();
+  Serial.println("--- Releve capteurs ---");
+
+  if (isnan(humidity) || isnan(dhtTemp)) {
+    Serial.println("DHT11         : erreur de lecture");
+  } else {
+    Serial.printf("DHT11         : %.1f C | %.1f %%\n", dhtTemp, humidity);
+  }
+
+  Serial.printf("Temperature NTC : %.1f C\n", ntcTemp);
+
+  // --- LDR ---
+  int ldrValue = analogReadAvg(LDR_PIN);
+  float ldrPct = ldrValue * 100.0 / 4095.0;
+  Serial.printf("Luminosite      : %.0f %%\n", ldrPct);
+  Serial.println();
 
   delay(READ_INTERVAL);
 }
