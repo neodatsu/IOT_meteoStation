@@ -6,14 +6,14 @@ Station meteorologique IoT basee sur un ESP32.
 
 - **DHT11** - Temperature et humidite
 - **Module de temperature NTC** - Temperature de precision (module autonome 4 broches avec thermistance)
-- **Module LDR (KY-018)** - Luminosite ambiante
+- **Module LDR** - Luminosite ambiante
 
 ## Materiel
 
 - ESP32 Wemos Lolin32 (wemosbat)
 - Capteur DHT11
 - Module de temperature NTC (4 broches : VCC, GND, DO, AO)
-- Module LDR KY-018 (3 broches : VCC, GND, Signal)
+- Module LDR (3 broches : VCC, GND, Signal)
 
 ## Branchements GPIO
 
@@ -31,7 +31,7 @@ Alimentation des capteurs en **3,3V** via la broche 3V3 de l'ESP32.
                     +-----------+
                     |  ESP32    |
                     |           |
-    DHT11           |           |        Module Temp       KY-018
+    DHT11           |           |        Module Temp       Module LDR
     +-------+       |           |         +--------+       +-------+
     | VCC   |--+----|3V3        |    +----|VCC     |  +----|VCC    |
     | DATA  |--|----|GPIO 27    |    |    |GND     |--|    |GND    |

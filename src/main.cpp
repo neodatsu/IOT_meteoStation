@@ -9,7 +9,7 @@
 // --- Configuration des pins ---
 #define DHT_PIN     27    // Data DHT11
 #define TEMP_AO_PIN 34    // Sortie analogique du module NTC
-#define LDR_PIN     35    // Signal du module LDR KY-018
+#define LDR_PIN     35    // Signal du module LDR LDR
 
 // --- Parametres DHT11 ---
 #define DHT_TYPE DHT11
