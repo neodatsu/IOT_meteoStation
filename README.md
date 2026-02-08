@@ -57,7 +57,7 @@ L'ESP32 se connecte automatiquement au WiFi au demarrage et se reconnecte en cas
 
 ### Configuration des identifiants
 
-Les identifiants WiFi sont stockes dans `include/credentials.h` qui est **exclu du depot git** (via `.gitignore`).
+Les identifiants (WiFi et MQTT) sont stockes dans `include/credentials.h` qui est **exclu du depot git** (via `.gitignore`).
 
 Pour configurer votre connexion :
 
@@ -67,11 +67,16 @@ Pour configurer votre connexion :
    cp include/credentials.h.example include/credentials.h
    ```
 
-2. Editer `include/credentials.h` avec votre SSID et mot de passe :
+2. Editer `include/credentials.h` avec vos parametres :
 
    ```cpp
-   #define WIFI_SSID "votre_ssid"
-   #define WIFI_PASS "votre_mot_de_passe"
+   #define WIFI_SSID   "votre_ssid"
+   #define WIFI_PASS   "votre_mot_de_passe"
+   #define MQTT_SERVER "mqtt.example.com"
+   #define MQTT_PORT   8883
+   #define MQTT_USER   "votre_email@example.com"
+   #define MQTT_PASS   "votre_mot_de_passe_mqtt"
+   #define MQTT_DEVICE "meteoStation_1"
    ```
 
 ### Comportement
@@ -80,6 +85,33 @@ Pour configurer votre connexion :
 - Timeout de connexion : **20 secondes**
 - Reconnexion automatique en cas de perte du signal
 - L'adresse IP est affichee dans les logs serie apres connexion
+
+## MQTT
+
+Les mesures sont publiees sur un broker MQTT en **TLS (port 8883)** a chaque releve.
+
+### Topic
+
+```text
+sensors/{MQTT_USER}/{MQTT_DEVICE}
+```
+
+### Format du message (JSON)
+
+```json
+{
+  "timestamp": "2026-02-08T15:30:00+01:00",
+  "user": "votre_email@example.com",
+  "device": "meteoStation_1",
+  "dht_temperature": 20.7,
+  "dht_humidity": 52.0,
+  "ntc_temperature": 21.1,
+  "luminosity": 77.0
+}
+```
+
+- **timestamp** : heure locale France (CET/CEST) au format ISO 8601, synchronisee via NTP
+- Si le DHT11 est en erreur, `dht_temperature` et `dht_humidity` sont a `null`
 
 ## Stack technique
 
