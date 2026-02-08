@@ -27,7 +27,7 @@ Alimentation des capteurs en **3,3V** via la broche 3V3 de l'ESP32.
 
 ### Schema de cablage
 
-```
+```text
                     +-----------+
                     |  ESP32    |
                     |           |
@@ -51,6 +51,36 @@ Alimentation des capteurs en **3,3V** via la broche 3V3 de l'ESP32.
     GND = masse commune
 ```
 
+## Connexion WiFi
+
+L'ESP32 se connecte automatiquement au WiFi au demarrage et se reconnecte en cas de perte de connexion.
+
+### Configuration des identifiants
+
+Les identifiants WiFi sont stockes dans `include/credentials.h` qui est **exclu du depot git** (via `.gitignore`).
+
+Pour configurer votre connexion :
+
+1. Copier le fichier exemple :
+
+   ```bash
+   cp include/credentials.h.example include/credentials.h
+   ```
+
+2. Editer `include/credentials.h` avec votre SSID et mot de passe :
+
+   ```cpp
+   #define WIFI_SSID "votre_ssid"
+   #define WIFI_PASS "votre_mot_de_passe"
+   ```
+
+### Comportement
+
+- Mode **Station (STA)** : l'ESP32 se connecte a un reseau existant
+- Timeout de connexion : **20 secondes**
+- Reconnexion automatique en cas de perte du signal
+- L'adresse IP est affichee dans les logs serie apres connexion
+
 ## Stack technique
 
 - **Framework** : Arduino (via PlatformIO)
@@ -59,7 +89,7 @@ Alimentation des capteurs en **3,3V** via la broche 3V3 de l'ESP32.
 
 ## Structure du projet
 
-```
+```text
 meteoStation/
 ├── src/           # Code source principal
 ├── include/       # Headers du projet
@@ -71,12 +101,15 @@ meteoStation/
 ## Installation
 
 1. Cloner le repository :
+
    ```bash
    git clone https://github.com/neodatsu/IOT_meteoStation.git
    ```
+
 2. Ouvrir le projet dans VSCode avec l'extension PlatformIO
 3. Brancher l'ESP32 en USB
 4. Build et upload :
+
    ```bash
    pio run --target upload
    ```
